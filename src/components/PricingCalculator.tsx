@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { CartItem, Product } from '../types/Product'
 import './PricingCalculator.css'
-import { ACTIONS, useCartDispatch } from '../CartContext'
+import { CART_ACTIONS, useCartDispatch } from '../CartContext'
 import Modal from './Modal'
 import FormQuoteRequest from './FormQuoteRequest'
 import { calculatePrice, formatPriceCLP, getDiscount } from '../libs'
@@ -10,6 +10,11 @@ import { useToast } from './ToastProvider'
 interface PricingCalculatorProps {
   product: Product
 }
+
+/**
+ *  Esto lo toque poco, solo arregle el bug, y le puse contexto de toast y cart.
+ *  Y le agregue el modal de formulario de cotizacion
+ */
 
 const PricingCalculator = ({ product }: PricingCalculatorProps) => {
   const [quantity, setQuantity] = useState<number>(1)
@@ -56,7 +61,7 @@ const PricingCalculator = ({ product }: PricingCalculatorProps) => {
       totalPrice: Math.round(unitPrice * quantity * (1 - (discountPercent ?? 0) / 100)),
     }
 
-    cartDispatch({type: ACTIONS.CART_INSERT_ITEM, payload: newItem})
+    cartDispatch({type: CART_ACTIONS.INSERT, payload: newItem})
     toast.success(`Agregado ${quantity} ${newItem.name} a tu carrito de compras.`)
   }
 

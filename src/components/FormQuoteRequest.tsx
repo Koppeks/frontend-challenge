@@ -9,6 +9,14 @@ import { useToast } from "./ToastProvider";
 import { validateFormQuote } from "../libs";
 import { Field, FormQuoteErrors } from "../types/Product";
 
+/**
+ * 
+ * Formulario simple con validación simple
+ * Pense en agregar Formik y yup/zod, pero no estaba seguro si ustedes lo iban a tomar como "Libreria pesada".
+ * No envia emails, no me dio el tiempo de agregar más cosas 
+ * 
+ */
+
 const FormQuoteRequest = () => {
   const [errors, setErrors] = useState<FormQuoteErrors>({});
   const toast = useToast();

@@ -11,6 +11,13 @@ type ModalProps = {
   closeOnOverlayClick?: boolean
 }
 
+/**
+ * Modal completamente custom, que se le pasa un children como componente interno
+ *  
+ * Lo utilice para el carrito, y los "call to action" en la pagina de detalles de producto
+ * 
+ */
+
 export default function Modal({
   open,
   onClose,

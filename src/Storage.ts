@@ -1,5 +1,11 @@
 import { CartItem, FormQuote } from "./types/Product"
 
+/**
+ * Aca es donde guardo y obtengo la informacion del localstorage,
+ * que se sincroniza con el provider de que ve el usuario en vivo.
+ * (No se roben mis credenciales)
+ */
+
 export const CART_KEY = 'cart:v1';
 export const FORM_KEY = 'form:v1';
 

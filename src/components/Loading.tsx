@@ -2,6 +2,15 @@ import { useEffect } from 'react'
 import './loading.css'
 import { LoadingProps } from '../types/Product'
 
+/**
+ * Un loading simplon, lo saque de internet.
+ * Solo aplica con un suspence que wrappea a toda la app. 
+ * 
+ * No utilize este loading en componentes (Como cards o busqueda)
+ * Ya que al ser mockup, carga todo instantaneo
+ * 
+ */
+
 export default function Loading({ open, text = 'Cargando…' }: LoadingProps) {
   // lock scroll while visible
   useEffect(() => {

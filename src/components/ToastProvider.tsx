@@ -4,6 +4,13 @@ import React, {
 import { createPortal } from 'react-dom'
 import './ToastProvider.css'
 
+/**
+ * Una toast simple con muchisimas variables, esta la saque de chatgpt completamente,
+ * Lo unico que cambie fueron los colores.
+ * 
+ * 
+ */
+
 type Variant = 'info' | 'success' | 'warning' | 'error'
 
 type Toast = {

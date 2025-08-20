@@ -1,8 +1,14 @@
-import { ACTIONS, useCartDispatch } from "../CartContext"
+import { CART_ACTIONS, useCartDispatch } from "../CartContext"
 import { buildQuoteSummary, calculatePrice, canAddToCart, downloadJSON, formatPriceCLP, getDiscount } from "../libs"
 import { CartItem, QuoteRequestInterface } from "../types/Product"
 import { useToast } from "./ToastProvider"
 
+/**
+ *  Cotizacion automatica, que tiene botones para agregar al carro y para exportar como json.
+ *  El contenido ademas aplica las ofertas y porcentajes de descuento de el producto seleccionado 
+ * si este sobrepasa el "threshold" minimo asigando en priceBreaks
+ *  Ademas tiene un boton para exportar como json.
+ */
 
 const QuoteRequest = ({quantity, product, onClose}:QuoteRequestInterface) => {
 
@@ -24,7 +30,7 @@ const QuoteRequest = ({quantity, product, onClose}:QuoteRequestInterface) => {
       totalPrice: Math.round(unitPrice * quantity),
     }
     toast.success(`Agregado ${quantity} ${newItem.name} a tu carrito de compras.`)
-    cartDispatch({type: ACTIONS.CART_INSERT_ITEM, payload: newItem})
+    cartDispatch({type: CART_ACTIONS.INSERT, payload: newItem})
   }
 
 

@@ -5,7 +5,7 @@ import { CartItem, Product } from '../types/Product'
 import PricingCalculator from '../components/PricingCalculator'
 import './ProductDetail.css'
 import { calculatePrice, canAddToCart } from '../libs'
-import { ACTIONS, useCartDispatch } from '../CartContext'
+import { CART_ACTIONS, useCartDispatch } from '../CartContext'
 import Modal from '../components/Modal'
 import QuoteRequest from '../components/QuoteRequest'
 import { useToast } from '../components/ToastProvider'
@@ -60,14 +60,14 @@ const ProductDetail = () => {
       const newItem: CartItem = {
         ...product,
         quantity,
-        selectedColor: "",
-        selectedSize: "",
+        selectedColor: selectedColor,
+        selectedSize: selectedSize,
         unitPrice: unitPrice,
         totalPrice: Math.round(unitPrice * quantity),
       }
   
       toast.success(`Agregado ${quantity} ${newItem.name} a tu carrito de compras.`)
-      cartDispatch({type: ACTIONS.CART_INSERT_ITEM, payload: newItem})
+      cartDispatch({type: CART_ACTIONS.INSERT, payload: newItem})
     }
 
   return (

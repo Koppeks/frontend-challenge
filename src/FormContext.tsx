@@ -2,6 +2,11 @@ import { createContext, useContext, useEffect, useReducer } from "react"
 import {FormQuote } from "./types/Product"
 import { loadFormQuote, saveFormQuote } from "./Storage";
 
+/**
+ * Es basicamente lo mismo que el cart context. Es un semi crud de un formulario de contacto.
+ * 
+ */
+
 const FormQuoteContext = createContext<FormQuote>({email: "", title: "", message:"", name: ""})
 
 type FormQuoteAction = { type: string; payload:{field: string, text: string}}

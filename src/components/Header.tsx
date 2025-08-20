@@ -5,6 +5,13 @@ import { useState } from 'react'
 import Modal from './Modal'
 import Cart from './Cart'
 
+/**
+ * 
+ * El header se actualiza dentro del contexto del carrito 
+ * No le agregue mucho, aparte de el propio modal del carrito 
+ * 
+ */
+
 const Header = () => {
 
   const {countItems} = useCart()

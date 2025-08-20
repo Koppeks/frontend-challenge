@@ -1,4 +1,4 @@
-import { FormQuote, FormQuoteErrors, PriceBreak, Product, QuoteSummary } from "./types/Product"
+import { CartItem, FormQuote, FormQuoteErrors, PriceBreak, Product, QuoteSummary } from "./types/Product"
 
 export const getPriceRange = (num1:number, num2:number) =>{
   num1 = num1 < 0 ? 0 : num1
@@ -73,6 +73,49 @@ export const canAddToCart = (product:Product) => {
     return { unitPrice: product.basePrice * (1 - dPct / 100), discountPercent: dPct, appliedBreak: applied }
   }
   return { unitPrice: product.basePrice, discountPercent: 0, appliedBreak: applied }
+}
+
+export const norm = (s?: string) => (s ?? '').trim().toLowerCase()
+
+export const lineKey = (i: Pick<CartItem,'id'|'selectedColor'|'selectedSize'>) =>
+  `${i.id}|${norm(i.selectedColor)}|${norm(i.selectedSize)}`
+
+export function recalcLine(p: Product, qty: number) {
+  const q = Math.max(1, Math.floor(qty))
+  const price = getUnitPriceWithBreak(q, p)
+  const totalPrice = Math.round(price.unitPrice * q)
+  return { quantity: q, price: price.unitPrice, totalPrice }
+}
+
+export function upsertCartLine(state: CartItem[], incoming: CartItem): CartItem[] {
+  const key = lineKey(incoming)
+  const i = state.findIndex(it => lineKey(it) === key)
+
+  const existingQty = i >= 0 ? Math.max(1, state[i].quantity ?? 1) : 0
+  const addQty = Math.max(1, incoming.quantity ?? 1)
+  const mergedQty = existingQty + addQty
+
+  const stock = incoming.stock ?? Infinity
+  const finalQty = Math.min(mergedQty, stock)
+  const recalc = recalcLine(incoming, finalQty)
+
+  if (i >= 0) {
+    const next = state.slice()
+    next[i] = { ...state[i], ...recalc } // keep same variant; just update qty/prices
+    return next
+  }
+  return [...state, { ...incoming, ...recalcLine(incoming, addQty) }]
+}
+
+export function consolidateCart(items: CartItem[]): CartItem[] {
+  const map = new Map<string, CartItem>()
+  for (const it of items) {
+    const key = lineKey(it)
+    const prev = map.get(key)
+    const q = (prev?.quantity ?? 0) + Math.max(1, it.quantity ?? 1)
+    map.set(key, { ...(prev ?? it), ...recalcLine(it, q) })
+  }
+  return [...map.values()]
 }
 
   export function buildQuoteSummary(product: Product, quantity: number, taxRatePct?: number): QuoteSummary {

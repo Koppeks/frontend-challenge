@@ -3,6 +3,13 @@ import { categories, suppliers } from '../data/products'
 import { PriceRange } from '../types/Product'
 import './ProductFilters.css'
 
+/**
+ * Modifique el sortBy, agregue filtros de suplier, de rango de precios, y para limpiar los filtros.
+ * (Perdon si no se ve lindo, ya estoy muy cansado)
+ * 
+ * 
+ */
+
 interface ProductFiltersProps {
   selectedCategory: string
   searchQuery: string

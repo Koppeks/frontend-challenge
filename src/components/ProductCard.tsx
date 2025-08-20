@@ -5,6 +5,9 @@ import './ProductCard.css'
 interface ProductCardProps {
   product: Product
 }
+ /**
+  * Cambios minimos, arregle unos bugs y nada más
+  */
 
 const ProductCard = ({ product }: ProductCardProps) => {
   // Handle product status display
