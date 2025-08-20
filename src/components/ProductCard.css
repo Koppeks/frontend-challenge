@@ -50,9 +50,13 @@
 }
 
 .product-status {
-  position: absolute;
+  /* Bug encontrado 1 - Position absolute no mostraba correctamente la disponibilidad */
   top: 12px;
   right: 12px;
+}
+
+.product-image .product-status{
+  position: absolute;
 }
 
 /* Status Badges */

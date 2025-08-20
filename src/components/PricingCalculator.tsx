@@ -1,6 +1,11 @@
-import { useState } from 'react'
-import { Product } from '../types/Product'
+import { useEffect, useState } from 'react'
+import { CartItem, Product } from '../types/Product'
 import './PricingCalculator.css'
+import { ACTIONS, useCartDispatch } from '../CartContext'
+import Modal from './Modal'
+import FormQuoteRequest from './FormQuoteRequest'
+import { calculatePrice, formatPriceCLP, getDiscount } from '../libs'
+import { useToast } from './ToastProvider'
 
 interface PricingCalculatorProps {
   product: Product
@@ -9,44 +14,51 @@ interface PricingCalculatorProps {
 const PricingCalculator = ({ product }: PricingCalculatorProps) => {
   const [quantity, setQuantity] = useState<number>(1)
   const [selectedBreak, setSelectedBreak] = useState<number>(0)
+  const [openModal, setOpenModal] = useState<boolean>(false)
+  const toast = useToast()
 
-  // Calculate best pricing for quantity
-  const calculatePrice = (qty: number) => {
+  const cartDispatch = useCartDispatch()
+
+  /**
+   * Bug de calculo 
+   */
+  useEffect(() => {
     if (!product.priceBreaks || product.priceBreaks.length === 0) {
-      return product.basePrice * qty
+      if (selectedBreak !== -1) setSelectedBreak(-1)
+      return
     }
-
-    // Find applicable price break
-    let applicableBreak = product.priceBreaks[0]
+    
+    let highest = -1
     for (let i = 0; i < product.priceBreaks.length; i++) {
-      if (qty >= product.priceBreaks[i].minQty) {
-        applicableBreak = product.priceBreaks[i]
+      if (quantity >= product.priceBreaks[i].minQty) {
+        highest = i
       }
     }
 
-    return applicableBreak.price * qty
-  }
+    // only update if different
+    if (highest !== selectedBreak) {
+      setSelectedBreak(highest)
+    }
+  }, [quantity, product.priceBreaks, selectedBreak])
 
-  // Calculate discount amount
-  const getDiscount = (qty: number) => {
-    if (!product.priceBreaks || product.priceBreaks.length === 0) {
-      return 0
+  const currentPrice = calculatePrice(quantity, product)
+  const discountPercent = getDiscount(quantity, product)
+
+  const addToCart = () => {
+    const unitPrice = calculatePrice(quantity, product) / Math.max(1, quantity);
+
+    const newItem: CartItem = {
+      ...product,
+      quantity,
+      selectedColor: "",
+      selectedSize: "",
+      unitPrice: unitPrice,
+      totalPrice: Math.round(unitPrice * quantity * (1 - (discountPercent ?? 0) / 100)),
     }
 
-    const baseTotal = product.basePrice * qty
-    const discountedTotal = calculatePrice(qty)
-    
-    // Calculate savings percentage
-    return ((baseTotal - discountedTotal) / baseTotal) * 100
+    cartDispatch({type: ACTIONS.CART_INSERT_ITEM, payload: newItem})
+    toast.success(`Agregado ${quantity} ${newItem.name} a tu carrito de compras.`)
   }
-
-  // Format price display
-  const formatPrice = (price: number) => {
-    return `$${price.toLocaleString()}` // Should be CLP formatting
-  }
-
-  const currentPrice = calculatePrice(quantity)
-  const discountPercent = getDiscount(quantity)
 
   return (
     <div className="pricing-calculator">
@@ -68,10 +80,12 @@ const PricingCalculator = ({ product }: PricingCalculatorProps) => {
               onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
               className="quantity-input p1"
               min="1"
-              max="10000"
-            />
+              max={product.stock} //Bug de Validacion
+              />
             <span className="quantity-unit l1">unidades</span>
           </div>
+            {quantity == product.stock && // Bug de Validacion, visual validation for user that reach the limit.
+            <span className="quantity-limit l1">Se a alcanzado el número máximo de disponibilidad para esta prenda</span>}
         </div>
 
         {/* Price Breaks */}
@@ -96,7 +110,7 @@ const PricingCalculator = ({ product }: PricingCalculatorProps) => {
                       {priceBreak.minQty}+ unidades
                     </div>
                     <div className="break-price p1-medium">
-                      {formatPrice(priceBreak.price)}
+                      {formatPriceCLP(priceBreak.price)}
                     </div>
                     {priceBreak.discount && (
                       <div className="break-discount l1">
@@ -115,7 +129,7 @@ const PricingCalculator = ({ product }: PricingCalculatorProps) => {
           <div className="summary-row">
             <span className="summary-label p1">Precio unitario:</span>
             <span className="summary-value p1-medium">
-              {formatPrice(calculatePrice(quantity) / quantity)}
+              {formatPriceCLP(calculatePrice(quantity, product) / quantity)}
             </span>
           </div>
           
@@ -136,18 +150,24 @@ const PricingCalculator = ({ product }: PricingCalculatorProps) => {
           <div className="summary-row total-row">
             <span className="summary-label p1-medium">Total:</span>
             <span className="summary-value total-value h2">
-              {formatPrice(currentPrice)}
+              {formatPriceCLP(currentPrice)}
             </span>
           </div>
         </div>
 
         {/* Actions */}
         <div className="calculator-actions">
+
+          <Modal open={openModal} onClose={() => setOpenModal(false)} title='Solicita Cotización oficial'>
+            <FormQuoteRequest/>
+          </Modal>
+
           <button 
             className="btn btn-secondary cta1"
             onClick={() => {
+              setOpenModal(true)
               // Handle quote request
-              alert(`Cotización solicitada para ${quantity} unidades de ${product.name}`)
+              // alert(`Cotización solicitada para ${quantity} unidades de ${product.name}`)
             }}
           >
             <span className="material-icons">email</span>
@@ -158,7 +178,7 @@ const PricingCalculator = ({ product }: PricingCalculatorProps) => {
             className="btn btn-primary cta1"
             onClick={() => {
               // Add to cart functionality
-              alert('Función de agregar al carrito por implementar')
+              addToCart()
             }}
           >
             <span className="material-icons">shopping_cart</span>

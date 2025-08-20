@@ -5,6 +5,11 @@
   box-sizing: border-box;
 }
 
+html{
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+}
+
 body {
   font-family: 'Inter', sans-serif;
   line-height: 1.6;
@@ -124,9 +129,33 @@ body {
   border-radius: 8px;
   padding: 12px 16px;
   transition: all 0.2s;
+  font-family: inherit;
+  font-size: inherit;
 }
 
-.form-input:focus {
+.form-textarea {
+  width: 100%;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 12px 16px;
+  transition: all 0.2s;
+  height: 140px;
+  font-family: inherit;
+  font-size: inherit;
+}
+
+.is-invalid {
+  border-color: #dc2626;
+}
+
+.input-error{
+  padding-left: 4px;
+  color: #dc2626;
+  font-size: 14px;
+}
+
+.form-input:focus, .form-textarea:focus{
   outline: none;
   border-color: #667eea;
   background: white;

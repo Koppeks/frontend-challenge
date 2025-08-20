@@ -1,9 +1,14 @@
 import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { products } from '../data/products'
-import { Product } from '../types/Product'
+import { CartItem, Product } from '../types/Product'
 import PricingCalculator from '../components/PricingCalculator'
 import './ProductDetail.css'
+import { calculatePrice, canAddToCart } from '../libs'
+import { ACTIONS, useCartDispatch } from '../CartContext'
+import Modal from '../components/Modal'
+import QuoteRequest from '../components/QuoteRequest'
+import { useToast } from '../components/ToastProvider'
 
 const ProductDetail = () => {
   const { id } = useParams<{ id: string }>()
@@ -11,6 +16,11 @@ const ProductDetail = () => {
   const [selectedColor, setSelectedColor] = useState<string>('')
   const [selectedSize, setSelectedSize] = useState<string>('')
   const [quantity, setQuantity] = useState<number>(1)
+  const [openModal, setOpenModal] = useState<boolean>(false)
+
+  const cartDispatch = useCartDispatch()
+
+  const toast = useToast()
 
   useEffect(() => {
     if (id) {
@@ -43,9 +53,22 @@ const ProductDetail = () => {
       </div>
     )
   }
-
-  // Validate product status
-  const canAddToCart = product.status === 'active' && product.stock > 0
+  
+    const addToCart = () => {
+      const unitPrice = calculatePrice(quantity, product) / Math.max(1, quantity);
+  
+      const newItem: CartItem = {
+        ...product,
+        quantity,
+        selectedColor: "",
+        selectedSize: "",
+        unitPrice: unitPrice,
+        totalPrice: Math.round(unitPrice * quantity),
+      }
+  
+      toast.success(`Agregado ${quantity} ${newItem.name} a tu carrito de compras.`)
+      cartDispatch({type: ACTIONS.CART_INSERT_ITEM, payload: newItem})
+    }
 
   return (
     <div className="product-detail-page">
@@ -182,18 +205,21 @@ const ProductDetail = () => {
               </div>
 
               <div className="action-buttons">
+                <Modal open={openModal} onClose={() => setOpenModal(false)} title='Cotización oficial automatica'>
+                  <QuoteRequest quantity={quantity} product={product} onClose={() => setOpenModal(false)}/>
+                </Modal>
                 <button 
-                  className={`btn btn-primary cta1 ${!canAddToCart ? 'disabled' : ''}`}
-                  disabled={!canAddToCart}
-                  onClick={() => alert('Función de agregar al carrito por implementar')}
+                  className={`btn btn-primary cta1 ${!canAddToCart(product) ? 'disabled' : ''}`}
+                  disabled={!canAddToCart(product)}
+                  onClick={() => addToCart()}
                 >
                   <span className="material-icons">shopping_cart</span>
-                  {canAddToCart ? 'Agregar al carrito' : 'No disponible'}
+                  {canAddToCart(product) ? 'Agregar al carrito' : 'No disponible'}
                 </button>
                 
                 <button 
                   className="btn btn-secondary cta1"
-                  onClick={() => alert('Función de cotización por implementar')}
+                  onClick={() => setOpenModal(true)}
                 >
                   <span className="material-icons">calculate</span>
                   Solicitar cotización

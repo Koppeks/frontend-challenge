@@ -1,0 +1,77 @@
+/* Overlay: full-screen, slightly opaque background */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  background: rgba(0, 0, 0, 0.40);
+  padding: 1rem;
+}
+
+/* Modal panel: white card */
+.modal-panel {
+  position: relative;
+  width: min(92vw, 640px);
+  max-height: calc(100vh - 8rem);
+  overflow: auto;
+  background: #fff;
+  color: #111;
+  border-radius: 12px;
+  box-shadow:
+    0 10px 15px rgba(0, 0, 0, 0.15),
+    0 4px 6px rgba(0, 0, 0, 0.10);
+  padding: 1.25rem 1.25rem 2rem;
+  outline: none;
+
+  /* subtle entrance */
+  transform: translateY(8px) scale(0.98);
+  opacity: 0;
+  animation: modal-in 160ms ease-out forwards;
+}
+
+@keyframes modal-in {
+  to {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+.modal-title {
+  margin: 0 2rem 0.75rem 0;
+  font-size: 1.125rem;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.modal-body {
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+/* Close button (top-right) */
+.modal-close {
+  position: absolute;
+  top: 0.4rem;
+  right: 0.6rem;
+  border: none;
+  background: transparent;
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+  color: #666;
+  padding: 0.25rem;
+  border-radius: 8px;
+}
+
+.modal-close:hover {
+  background: rgba(0, 0, 0, 0.06);
+  color: #222;
+}
+
+/* Accessible focus styles */
+.modal-panel:focus,
+.modal-close:focus {
+  outline: 2px solid #2563eb; /* blue */
+  outline-offset: 2px;
+}

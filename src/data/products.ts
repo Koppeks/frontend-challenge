@@ -9,13 +9,6 @@ export const categories: Category[] = [
   { id: 'home', name: 'Hogar', icon: 'home', count: 2 }
 ]
 
-// Proveedores
-export const suppliers: Supplier[] = [
-  { id: 'smart-gifts', name: 'Smart Gifts', products: 12 },
-  { id: 'top-gifts', name: 'Top Gifts', products: 5 },
-  { id: 'qr-code', name: 'QR Code', products: 3 }
-]
-
 // Product catalog data
 export const products: Product[] = [
   {
@@ -78,9 +71,15 @@ export const products: Product[] = [
     sku: 'POL-POLO-CORP',
     category: 'textile',
     supplier: 'smart-gifts',
-    status: 'inactive',
+    status: 'active',
     basePrice: 6800,
-    stock: 0,
+    /**
+     * Solucion Bug 4.
+     * Asumo que se refieren a cambiar de manera intencional este numero de 0 a 150, 
+     * ya que ningun stock aparte de este, sale "Sin stock".
+     * Y cambiar su status de "inactive" a "active".
+     */
+    stock: 150, 
     description: 'Polera polo de algodón 100% con bordado personalizable.',
     colors: ['Azul', 'Blanco', 'Negro', 'Gris'],
     sizes: ['S', 'M', 'L', 'XL', 'XXL'],
@@ -383,3 +382,17 @@ export const products: Product[] = [
     ]
   }
 ]
+
+const countsMap = new Map<string, number>()
+
+products.forEach(product => {
+  if(!countsMap.get(product.supplier)){
+    countsMap.set(product.supplier, 1)
+  }else{
+    countsMap.set(product.supplier, countsMap.get(product.supplier)! + 1 )
+  }
+});
+export const suppliers: Supplier[] = [];
+countsMap.forEach((value, key) => {
+  suppliers.push({id: key, name: key.split("-").map((name) => `${name.slice(0,1).toUpperCase()}${name.slice(1)}`).join(" ") , products: value})
+})

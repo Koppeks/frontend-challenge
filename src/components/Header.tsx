@@ -1,7 +1,15 @@
 import { Link } from 'react-router-dom'
 import './Header.css'
+import { useCart } from '../CartContext'
+import { useState } from 'react'
+import Modal from './Modal'
+import Cart from './Cart'
 
 const Header = () => {
+
+  const {countItems} = useCart()
+  const [openModal, setOpenModal] = useState(false)
+
   return (
     <header className="header">
       <div className="container">
@@ -20,9 +28,12 @@ const Header = () => {
               <span className="material-icons">home</span>
               Catálogo
             </Link>
-            <button className="nav-link l1" onClick={() => alert('Función de carrito por implementar')}>
+            <Modal open={openModal} onClose={() => setOpenModal(false)} title='Carro de compras'>
+              <Cart/>
+            </Modal>
+            <button className="nav-link l1" onClick={() => setOpenModal(true)}>
               <span className="material-icons">shopping_cart</span>
-              Carrito (0)
+              Carrito ({countItems})
             </button>
           </nav>
 

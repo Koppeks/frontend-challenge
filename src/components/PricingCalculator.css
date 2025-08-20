@@ -65,6 +65,9 @@
 .quantity-unit {
   color: #64748b;
 }
+.quantity-limit {
+  color: #e0615d;
+}
 
 /* Price Breaks */
 .price-breaks-section {
