@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import './loading.css'
+import './Loading.css'
 import { LoadingProps } from '../types/Product'
 
 /**
